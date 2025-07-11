@@ -86,6 +86,9 @@ export default function AdminSettingsPage() {
   const emailEnabled = config[emailEnabledKey] !== "false"
   const supportEmailKey = "SUPPORT_EMAIL"
 
+  // Announce rate limiting settings
+  const announceRateLimitingEnabled = config["ANNOUNCE_RATE_LIMITING_ENABLED"] === "true"
+
   return (
     <AdminLayout>
       <div className="max-w-3xl mx-auto py-10">
@@ -117,6 +120,69 @@ export default function AdminSettingsPage() {
                     />
                   </div>
                 ))}
+              </div>
+            </div>
+
+            {/* Announce Rate Limiting Section */}
+            <div>
+              <div className="flex items-center justify-between mb-4 mt-6">
+                <h2 className="text-xl font-semibold text-text">Announce Rate Limiting</h2>
+                <div className="flex items-center space-x-2">
+                  <span className="text-sm text-white">Enable Rate Limiting</span>
+                  <ToggleSwitch
+                    checked={announceRateLimitingEnabled}
+                    onChange={e => handleChange("ANNOUNCE_RATE_LIMITING_ENABLED", e.target.checked ? "true" : "false")}
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <FormField
+                    label="Announce Interval (seconds)"
+                    value={config["ANNOUNCE_INTERVAL"] || '900'}
+                    onChange={val => handleChange("ANNOUNCE_INTERVAL", val)}
+                    className="w-full text-white"
+                    type="number"
+                    disabled={!announceRateLimitingEnabled}
+                  />
+                  <p className="text-sm text-text-secondary mt-1">
+                    Main announce interval (default: 900 = 15 minutes)
+                  </p>
+                </div>
+                <div>
+                  <FormField
+                    label="Min Interval (seconds)"
+                    value={config["ANNOUNCE_MIN_INTERVAL"] || '300'}
+                    onChange={val => handleChange("ANNOUNCE_MIN_INTERVAL", val)}
+                    className="w-full text-white"
+                    type="number"
+                    disabled={!announceRateLimitingEnabled}
+                  />
+                  <p className="text-sm text-text-secondary mt-1">
+                    Minimum time between announces (default: 300 = 5 minutes)
+                  </p>
+                </div>
+                <div>
+                  <FormField
+                    label="Rate Limit Per Hour"
+                    value={config["ANNOUNCE_RATE_LIMIT_PER_HOUR"] || '60'}
+                    onChange={val => handleChange("ANNOUNCE_RATE_LIMIT_PER_HOUR", val)}
+                    className="w-full text-white"
+                    type="number"
+                    disabled={!announceRateLimitingEnabled}
+                  />
+                  <p className="text-sm text-text-secondary mt-1">
+                    Maximum announces per user per hour (default: 60)
+                  </p>
+                </div>
+              </div>
+              <div className="mt-4 p-4 bg-blue-900/20 border border-blue-500/30 rounded-md">
+                <h3 className="text-sm font-semibold text-blue-300 mb-2">Recommended Settings:</h3>
+                <ul className="text-sm text-blue-200 space-y-1">
+                  <li>• <strong>Announce Interval:</strong> 600-900 seconds (10-15 minutes) for better responsiveness</li>
+                  <li>• <strong>Min Interval:</strong> 300-600 seconds (5-10 minutes) for frequent updates</li>
+                  <li>• <strong>Rate Limit:</strong> 60-120 announces per hour to prevent abuse</li>
+                </ul>
               </div>
             </div>
 

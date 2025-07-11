@@ -73,6 +73,7 @@ model User {
   usedInvite          InviteCode?          @relation("UsedInvite")
   peers               Peer[]
   torrentCompletions  TorrentCompletion[]
+  announceRateLimits  AnnounceRateLimit[]
 }
 
 model VerificationToken {
@@ -121,6 +122,7 @@ model Torrent {
   votes       Vote[]
   peers       Peer[]
   torrentCompletions  TorrentCompletion[]
+  announceRateLimits  AnnounceRateLimit[]
 
   @@map("torrents")
 }
@@ -235,4 +237,21 @@ model TorrentCompletion {
   @@index([torrentId])
   @@index([userId])
   @@index([peerId])
+}
+
+model AnnounceRateLimit {
+  id        String   @id @default(cuid())
+  userId    String
+  ip        String
+  torrentId String
+  lastAnnounce DateTime @default(now())
+  announceCount Int @default(1)
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  torrent Torrent @relation(fields: [torrentId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, torrentId])
+  @@index([ip])
+  @@index([lastAnnounce])
+  @@map("announce_rate_limits")
 }
